@@ -6,6 +6,10 @@ Mini-application de gestion de posts en HTML/CSS/JavaScript vanilla (sans framew
 
 Application web simple permettant de créer, visualiser, modifier et supprimer des posts. L'interface utilise un design moderne avec des effets glassmorphism et un thème pastel.
 
+## 📸 Aperçu
+
+![Aperçu de l'application Posts Manager](img/Capture%20d'écran%202025-12-02%20181850.png)
+
 ## ✨ Fonctionnalités
 
 - **Liste des posts** : Affichage de tous les posts créés avec titre, description et date
