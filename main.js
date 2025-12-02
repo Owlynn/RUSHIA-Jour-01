@@ -19,6 +19,10 @@ const btnShowList = document.getElementById('btn-show-list'); // Bouton pour aff
 const btnShowForm = document.getElementById('btn-show-form'); // Bouton pour afficher la vue formulaire
 const btnGenerateDesc = document.getElementById('btn-generate-desc'); // Bouton pour générer une description
 const btnCancel = document.getElementById('btn-cancel'); // Bouton d'annulation du formulaire
+const deleteModal = document.getElementById('delete-modal'); // Modale de confirmation de suppression
+const modalPostTitle = document.getElementById('modal-post-title'); // Titre du post dans la modale
+const modalCancel = document.getElementById('modal-cancel'); // Bouton annuler de la modale
+const modalConfirm = document.getElementById('modal-confirm'); // Bouton confirmer de la modale
 
 // ============================================
 // GÉNÉRATION FAKE DE DESCRIPTION
@@ -177,10 +181,7 @@ function createPostCard(post) {
     btnDelete.className = 'btn-delete';
     btnDelete.textContent = '🗑️ Supprimer';
     btnDelete.addEventListener('click', () => {
-        if (confirm(`Êtes-vous sûr de vouloir supprimer le post "${post.title}" ?`)) {
-            deletePost(post.id);
-            renderPosts();
-        }
+        showDeleteModal(post.id, post.title);
     });
     
     actions.appendChild(btnEdit);
@@ -326,6 +327,40 @@ function handleGenerateDescription() {
     }, 300);
 }
 
+/**
+ * showDeleteModal - Affiche la modale de confirmation de suppression
+ * @param {number} postId - ID du post à supprimer
+ * @param {string} postTitle - Titre du post à supprimer
+ */
+function showDeleteModal(postId, postTitle) {
+    modalPostTitle.textContent = `"${postTitle}"`;
+    deleteModal.classList.add('active');
+    
+    // Stocker l'ID du post à supprimer dans un attribut data
+    deleteModal.dataset.postId = postId;
+}
+
+/**
+ * hideDeleteModal - Cache la modale de confirmation
+ */
+function hideDeleteModal() {
+    deleteModal.classList.remove('active');
+    deleteModal.dataset.postId = '';
+}
+
+/**
+ * handleModalConfirm - Gère la confirmation de suppression
+ */
+function handleModalConfirm() {
+    const postId = parseInt(deleteModal.dataset.postId);
+    
+    if (postId) {
+        deletePost(postId);
+        renderPosts();
+        hideDeleteModal();
+    }
+}
+
 // ============================================
 // INITIALISATION DE L'APPLICATION
 // ============================================
@@ -344,6 +379,18 @@ function init() {
     btnCancel.addEventListener('click', () => {
         resetForm();
         showListView();
+    });
+    
+    // Modale de suppression
+    modalConfirm.addEventListener('click', handleModalConfirm);
+    modalCancel.addEventListener('click', hideDeleteModal);
+    deleteModal.querySelector('.modal-overlay').addEventListener('click', hideDeleteModal);
+    
+    // Fermer la modale avec la touche Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && deleteModal.classList.contains('active')) {
+            hideDeleteModal();
+        }
     });
     
     // Afficher la vue liste par défaut

@@ -72,6 +72,25 @@
         </section>
     </div>
 
+        <!-- Modale de confirmation de suppression -->
+        <div id="delete-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚠️ Confirmer la suppression</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le post <strong id="modal-post-title"></strong> ?</p>
+                    <p class="modal-warning">Cette action est irréversible.</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="modal-cancel" class="btn-secondary">Annuler</button>
+                    <button id="modal-confirm" class="btn-danger">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    
+
     <script src="main.js"></script>
 </body>
 </html>
