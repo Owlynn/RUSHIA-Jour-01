@@ -8,7 +8,7 @@ Application web simple permettant de créer, visualiser, modifier et supprimer d
 
 ## 📸 Aperçu
 
-![Aperçu de l'application Posts Manager](img/Capture%20d'écran%202025-12-02%20181850.png)
+![Aperçu de l'application Posts Manager](img/screenshot.png)
 
 ## ✨ Fonctionnalités
 
