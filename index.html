@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête avec navigation -->
+        <header class="header">
+            <h1>📝 Posts Manager</h1>
+            <nav class="nav-buttons">
+                <button id="btn-show-list" class="nav-btn active">Liste des posts</button>
+                <button id="btn-show-form" class="nav-btn">Nouveau post</button>
+            </nav>
+        </header>
+
+        <!-- Vue Liste des posts -->
+        <section id="view-list" class="view active">
+            <div class="posts-container">
+                <div id="posts-list" class="posts-list">
+                    <!-- Les posts seront injectés ici dynamiquement -->
+                </div>
+                <div id="empty-state" class="empty-state">
+                    <p>Aucun post pour le moment.</p>
+                    <p>Créez votre premier post !</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vue Formulaire (création/édition) -->
+        <section id="view-form" class="view">
+            <div class="form-container">
+                <h2 id="form-title">Nouveau post</h2>
+                <form id="post-form" class="post-form">
+                    <div class="form-group">
+                        <label for="post-title">Titre <span class="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="post-title" 
+                            name="title" 
+                            placeholder="Entrez un titre..."
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-description">Description</label>
+                        <textarea 
+                            id="post-description" 
+                            name="description" 
+                            rows="5"
+                            placeholder="Entrez une description (optionnel)..."
+                        ></textarea>
+                        <button type="button" id="btn-generate-desc" class="btn-generate">
+                            ✨ Proposer une description
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="btn-submit" class="btn-primary">
+                            Enregistrer
+                        </button>
+                        <button type="button" id="btn-cancel" class="btn-secondary">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
+
