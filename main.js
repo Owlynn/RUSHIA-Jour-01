@@ -23,6 +23,15 @@ const deleteModal = document.getElementById('delete-modal'); // Modale de confir
 const modalPostTitle = document.getElementById('modal-post-title'); // Titre du post dans la modale
 const modalCancel = document.getElementById('modal-cancel'); // Bouton annuler de la modale
 const modalConfirm = document.getElementById('modal-confirm'); // Bouton confirmer de la modale
+const successModal = document.getElementById('success-modal'); // Modale de succès
+const successModalTitle = document.getElementById('success-modal-title'); // Titre de la modale de succès
+const successModalMessage = document.getElementById('success-modal-message'); // Message de la modale de succès
+const successModalOk = document.getElementById('success-modal-ok'); // Bouton OK de la modale de succès
+
+// Vérification que les éléments de la modale de succès existent
+if (!successModal || !successModalTitle || !successModalMessage || !successModalOk) {
+    console.warn('La modale de succès n\'existe pas dans le HTML. Veuillez l\'ajouter.');
+}
 
 // ============================================
 // GÉNÉRATION FAKE DE DESCRIPTION
@@ -286,7 +295,7 @@ function handleFormSubmit(event) {
     
     // Validation : le titre est obligatoire
     if (!title) {
-        alert('Le titre est obligatoire !');
+        showSuccessModal('Erreur', 'Le titre est obligatoire !', 'error');
         postTitleInput.focus();
         return;
     }
@@ -296,16 +305,16 @@ function handleFormSubmit(event) {
         // Mode édition
         const updated = updatePost(currentEditingId, title, description);
         if (updated) {
-            alert('Post modifié avec succès !');
+            showSuccessModal('✅ Succès', 'Post modifié avec succès !', 'success');
             renderPosts();
             showListView();
         } else {
-            alert('Erreur lors de la modification du post.');
+            showSuccessModal('❌ Erreur', 'Erreur lors de la modification du post.', 'error');
         }
     } else {
         // Mode création
         createPost(title, description);
-        alert('Post créé avec succès !');
+        showSuccessModal('✅ Succès', 'Post créé avec succès !', 'success');
         renderPosts();
         showListView();
     }
@@ -358,7 +367,41 @@ function handleModalConfirm() {
         deletePost(postId);
         renderPosts();
         hideDeleteModal();
+        showSuccessModal('✅ Succès', 'Post supprimé avec succès !', 'success');
     }
+}
+
+/**
+ * showSuccessModal - Affiche la modale de succès
+ * @param {string} title - Titre de la modale
+ * @param {string} message - Message à afficher
+ * @param {string} type - Type de modale ('success' ou 'error')
+ */
+function showSuccessModal(title, message, type = 'success') {
+    // Vérifier que la modale existe
+    if (!successModal || !successModalTitle || !successModalMessage) {
+        // Fallback vers alert si la modale n'existe pas
+        alert(`${title}\n${message}`);
+        return;
+    }
+    
+    successModalTitle.textContent = title;
+    successModalMessage.textContent = message;
+    successModal.classList.add('active');
+    
+    // Ajouter une classe pour le type (success ou error)
+    const modalContent = successModal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.className = 
+            type === 'error' ? 'modal-content modal-error' : 'modal-content modal-success';
+    }
+}
+
+/**
+ * hideSuccessModal - Cache la modale de succès
+ */
+function hideSuccessModal() {
+    successModal.classList.remove('active');
 }
 
 // ============================================
@@ -386,10 +429,24 @@ function init() {
     modalCancel.addEventListener('click', hideDeleteModal);
     deleteModal.querySelector('.modal-overlay').addEventListener('click', hideDeleteModal);
     
-    // Fermer la modale avec la touche Escape
+    // Modale de succès
+    if (successModal && successModalOk) {
+        successModalOk.addEventListener('click', hideSuccessModal);
+        const overlay = successModal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', hideSuccessModal);
+        }
+    }
+    
+    // Fermer les modales avec la touche Escape
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && deleteModal.classList.contains('active')) {
-            hideDeleteModal();
+        if (event.key === 'Escape') {
+            if (deleteModal.classList.contains('active')) {
+                hideDeleteModal();
+            }
+            if (successModal.classList.contains('active')) {
+                hideSuccessModal();
+            }
         }
     });
     

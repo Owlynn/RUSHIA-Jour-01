@@ -517,6 +517,23 @@ body {
     border-color: rgba(255, 107, 107, 0.6);
 }
 
+/* Modale de succès */
+.modal-success {
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.modal-success .modal-header h3 {
+    color: #4caf50;
+}
+
+.modal-error {
+    border-color: rgba(255, 107, 107, 0.5);
+}
+
+.modal-error .modal-header h3 {
+    color: #ff6b6b;
+}
+
 /* ============================================
    RESPONSIVE
    ============================================ */
