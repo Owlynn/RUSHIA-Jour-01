@@ -19,19 +19,10 @@ const btnShowList = document.getElementById('btn-show-list'); // Bouton pour aff
 const btnShowForm = document.getElementById('btn-show-form'); // Bouton pour afficher la vue formulaire
 const btnGenerateDesc = document.getElementById('btn-generate-desc'); // Bouton pour générer une description
 const btnCancel = document.getElementById('btn-cancel'); // Bouton d'annulation du formulaire
-const deleteModal = document.getElementById('delete-modal'); // Modale de confirmation de suppression
-const modalPostTitle = document.getElementById('modal-post-title'); // Titre du post dans la modale
-const modalCancel = document.getElementById('modal-cancel'); // Bouton annuler de la modale
-const modalConfirm = document.getElementById('modal-confirm'); // Bouton confirmer de la modale
-const successModal = document.getElementById('success-modal'); // Modale de succès
-const successModalTitle = document.getElementById('success-modal-title'); // Titre de la modale de succès
-const successModalMessage = document.getElementById('success-modal-message'); // Message de la modale de succès
-const successModalOk = document.getElementById('success-modal-ok'); // Bouton OK de la modale de succès
-
-// Vérification que les éléments de la modale de succès existent
-if (!successModal || !successModalTitle || !successModalMessage || !successModalOk) {
-    console.warn('La modale de succès n\'existe pas dans le HTML. Veuillez l\'ajouter.');
-}
+const genericModal = document.getElementById('generic-modal'); // Modale générique unique
+const modalTitle = document.getElementById('modal-title'); // Titre de la modale
+const modalMessage = document.getElementById('modal-message'); // Message de la modale
+const modalActions = document.getElementById('modal-actions'); // Conteneur des boutons d'action
 
 // ============================================
 // GÉNÉRATION FAKE DE DESCRIPTION
@@ -190,7 +181,7 @@ function createPostCard(post) {
     btnDelete.className = 'btn-delete';
     btnDelete.textContent = '🗑️ Supprimer';
     btnDelete.addEventListener('click', () => {
-        showDeleteModal(post.id, post.title);
+        showModal('⚠️ Confirmer la suppression', `Êtes-vous sûr de vouloir supprimer le post <strong>"${post.title}"</strong> ?<br><br><span class="modal-warning">Cette action est irréversible.</span>`, 'confirm', { postId: post.id });
     });
     
     actions.appendChild(btnEdit);
@@ -295,7 +286,7 @@ function handleFormSubmit(event) {
     
     // Validation : le titre est obligatoire
     if (!title) {
-        showSuccessModal('Erreur', 'Le titre est obligatoire !', 'error');
+        showModal('Erreur', 'Le titre est obligatoire !', 'error');
         postTitleInput.focus();
         return;
     }
@@ -305,16 +296,16 @@ function handleFormSubmit(event) {
         // Mode édition
         const updated = updatePost(currentEditingId, title, description);
         if (updated) {
-            showSuccessModal('✅ Succès', 'Post modifié avec succès !', 'success');
+            showModal('✅ Succès', 'Post modifié avec succès !', 'success');
             renderPosts();
             showListView();
         } else {
-            showSuccessModal('❌ Erreur', 'Erreur lors de la modification du post.', 'error');
+            showModal('❌ Erreur', 'Erreur lors de la modification du post.', 'error');
         }
     } else {
         // Mode création
         createPost(title, description);
-        showSuccessModal('✅ Succès', 'Post créé avec succès !', 'success');
+        showModal('✅ Succès', 'Post créé avec succès !', 'success');
         renderPosts();
         showListView();
     }
@@ -337,71 +328,92 @@ function handleGenerateDescription() {
 }
 
 /**
- * showDeleteModal - Affiche la modale de confirmation de suppression
- * @param {number} postId - ID du post à supprimer
- * @param {string} postTitle - Titre du post à supprimer
- */
-function showDeleteModal(postId, postTitle) {
-    modalPostTitle.textContent = `"${postTitle}"`;
-    deleteModal.classList.add('active');
-    
-    // Stocker l'ID du post à supprimer dans un attribut data
-    deleteModal.dataset.postId = postId;
-}
-
-/**
- * hideDeleteModal - Cache la modale de confirmation
- */
-function hideDeleteModal() {
-    deleteModal.classList.remove('active');
-    deleteModal.dataset.postId = '';
-}
-
-/**
- * handleModalConfirm - Gère la confirmation de suppression
- */
-function handleModalConfirm() {
-    const postId = parseInt(deleteModal.dataset.postId);
-    
-    if (postId) {
-        deletePost(postId);
-        renderPosts();
-        hideDeleteModal();
-        showSuccessModal('✅ Succès', 'Post supprimé avec succès !', 'success');
-    }
-}
-
-/**
- * showSuccessModal - Affiche la modale de succès
+ * showModal - Affiche la modale générique avec différents contextes
  * @param {string} title - Titre de la modale
  * @param {string} message - Message à afficher
- * @param {string} type - Type de modale ('success' ou 'error')
+ * @param {string} type - Type de modale ('confirm', 'success', 'error')
+ * @param {Object} options - Options supplémentaires (postId pour confirmation de suppression)
  */
-function showSuccessModal(title, message, type = 'success') {
+function showModal(title, message, type = 'success', options = {}) {
     // Vérifier que la modale existe
-    if (!successModal || !successModalTitle || !successModalMessage) {
+    if (!genericModal || !modalTitle || !modalMessage || !modalActions) {
         // Fallback vers alert si la modale n'existe pas
         alert(`${title}\n${message}`);
         return;
     }
     
-    successModalTitle.textContent = title;
-    successModalMessage.textContent = message;
-    successModal.classList.add('active');
+    // Définir le titre et le message
+    modalTitle.textContent = title;
+    modalMessage.innerHTML = message; // Utiliser innerHTML pour permettre le HTML dans le message
     
-    // Ajouter une classe pour le type (success ou error)
-    const modalContent = successModal.querySelector('.modal-content');
+    // Réinitialiser les actions
+    modalActions.innerHTML = '';
+    
+    // Configurer le style selon le type
+    const modalContent = genericModal.querySelector('.modal-content');
     if (modalContent) {
-        modalContent.className = 
-            type === 'error' ? 'modal-content modal-error' : 'modal-content modal-success';
+        // Réinitialiser les classes
+        modalContent.className = 'modal-content';
+        
+        // Ajouter la classe selon le type
+        if (type === 'error') {
+            modalContent.classList.add('modal-error');
+        } else if (type === 'success') {
+            modalContent.classList.add('modal-success');
+        } else if (type === 'confirm') {
+            modalContent.classList.add('modal-confirm');
+        }
     }
+    
+    // Créer les boutons selon le type
+    if (type === 'confirm') {
+        // Modale de confirmation : 2 boutons (Annuler / Confirmer)
+        const btnCancel = document.createElement('button');
+        btnCancel.className = 'btn-secondary';
+        btnCancel.textContent = 'Annuler';
+        btnCancel.addEventListener('click', hideModal);
+        
+        const btnConfirm = document.createElement('button');
+        btnConfirm.className = 'btn-danger';
+        btnConfirm.textContent = 'Supprimer';
+        btnConfirm.addEventListener('click', () => {
+            if (options.postId) {
+                deletePost(options.postId);
+                renderPosts();
+                hideModal();
+                showModal('✅ Succès', 'Post supprimé avec succès !', 'success');
+            }
+        });
+        
+        modalActions.appendChild(btnCancel);
+        modalActions.appendChild(btnConfirm);
+        
+        // Stocker l'ID du post dans un attribut data pour référence
+        if (options.postId) {
+            genericModal.dataset.postId = options.postId;
+        }
+    } else {
+        // Modale de succès/erreur : 1 bouton (OK)
+        const btnOk = document.createElement('button');
+        btnOk.className = 'btn-primary';
+        btnOk.textContent = 'OK';
+        btnOk.addEventListener('click', hideModal);
+        
+        modalActions.appendChild(btnOk);
+    }
+    
+    // Afficher la modale
+    genericModal.classList.add('active');
 }
 
 /**
- * hideSuccessModal - Cache la modale de succès
+ * hideModal - Cache la modale générique
  */
-function hideSuccessModal() {
-    successModal.classList.remove('active');
+function hideModal() {
+    if (genericModal) {
+        genericModal.classList.remove('active');
+        genericModal.dataset.postId = '';
+    }
 }
 
 // ============================================
@@ -424,28 +436,19 @@ function init() {
         showListView();
     });
     
-    // Modale de suppression
-    modalConfirm.addEventListener('click', handleModalConfirm);
-    modalCancel.addEventListener('click', hideDeleteModal);
-    deleteModal.querySelector('.modal-overlay').addEventListener('click', hideDeleteModal);
-    
-    // Modale de succès
-    if (successModal && successModalOk) {
-        successModalOk.addEventListener('click', hideSuccessModal);
-        const overlay = successModal.querySelector('.modal-overlay');
+    // Modale générique : fermer en cliquant sur l'overlay
+    if (genericModal) {
+        const overlay = genericModal.querySelector('.modal-overlay');
         if (overlay) {
-            overlay.addEventListener('click', hideSuccessModal);
+            overlay.addEventListener('click', hideModal);
         }
     }
     
-    // Fermer les modales avec la touche Escape
+    // Fermer la modale avec la touche Escape
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
-            if (deleteModal.classList.contains('active')) {
-                hideDeleteModal();
-            }
-            if (successModal.classList.contains('active')) {
-                hideSuccessModal();
+            if (genericModal && genericModal.classList.contains('active')) {
+                hideModal();
             }
         }
     });

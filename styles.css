@@ -519,9 +519,13 @@ body {
     border-color: rgba(255, 107, 107, 0.6);
 }
 
-/* Modale de suppression - même apparence que les autres modales, seule la couleur du titre change */
-#delete-modal .modal-header h3 {
+/* Modale de confirmation - même apparence que les autres modales, seule la couleur du titre change */
+.modal-confirm .modal-header h3 {
     color: #c82333;
+}
+
+.modal-confirm .modal-body p {
+    color: #444;
 }
 
 /* Modale de succès - même apparence que les autres modales, seule la couleur du texte change */
